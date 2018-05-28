@@ -1,6 +1,8 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.2.RELEASE'
+		querydslVersion    = "4.1.4"
+		metaModelsSourcesDir = file("target/querydsl/java/")
 	}
 	repositories {
 		mavenCentral()
@@ -8,6 +10,11 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 	}
+}
+
+plugins {
+	id 'io.franzbecker.gradle-lombok' version '1.12'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.9"
 }
 
 apply plugin: 'java'
@@ -23,18 +30,52 @@ repositories {
 	mavenCentral()
 }
 
+sourceSets {
+	main {
+		java {
+			srcDir metaModelsSourcesDir
+		}
+	}
+}
+
+//[task
+project.afterEvaluate {
+	project.tasks.compileQuerydsl.doFirst {
+		delete metaModelsSourcesDir
+		metaModelsSourcesDir.mkdirs()
+	}
+	project.tasks.compileQuerydsl.options.compilerArgs = [
+			"-proc:only",
+			"-processor", 'com.querydsl.apt.jpa.JPAAnnotationProcessor' +
+					',lombok.launch.AnnotationProcessorHider$AnnotationProcessor',
+			"-s",metaModelsSourcesDir
+	]
+}
+
+clean{
+	delete metaModelsSourcesDir;
+}
+
+//task]
+
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.projectlombok:lombok')
 	runtime('org.springframework.boot:spring-boot-devtools')
 	runtime('com.h2database:h2')
-	compileOnly('org.projectlombok:lombok')
+
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')
 
+	//querydsl
+	compile("com.querydsl:querydsl-core:$querydslVersion")
+	compile("com.querydsl:querydsl-apt:$querydslVersion")
+	compile("com.querydsl:querydsl-jpa:$querydslVersion")
+	//webjars
 	compile 'org.webjars:jquery:3.3.1-1'
 	compile 'org.webjars:bootstrap:4.1.0'
 }
