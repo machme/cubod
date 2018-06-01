@@ -17,7 +17,7 @@ public class Reply {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "user_no")
-    private User user;
+    @JoinColumn(name = "member_no")
+    private Member member;
 
 }

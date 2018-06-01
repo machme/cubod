@@ -20,6 +20,6 @@ public class Bookmark {
 
     @ManyToOne
     @JoinColumn(name = "user_no")
-    private User user;
+    private Member member;
 
 }

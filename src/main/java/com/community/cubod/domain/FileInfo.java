@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "file")
+@Table(name = "file_info")
 @Getter
 @Setter
 public class FileInfo {
@@ -18,16 +18,5 @@ public class FileInfo {
     private String mimeType;
     private String path;
     private Integer size;
-
-    @ManyToOne
-    @JoinColumn(name = "board_no")
-    private Board board;
-
-    public void setBoard(Board board){
-        this.board = board;
-        if(!board.getFileInfoList().contains(this)){
-            board.getFileInfoList().add(this);
-        }
-    }
 
 }

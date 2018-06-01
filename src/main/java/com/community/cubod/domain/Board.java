@@ -31,8 +31,15 @@ public class Board {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "user_no")
-    private User user;
+    @JoinColumn(name = "member_no")
+    private Member member;
+
+    public void setMember(Member member){
+        this.member = member;
+        if(!member.getBoardList().contains(this)){
+            member.getBoardList().add(this);
+        }
+    }
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<BoardTag> boardTagList = new ArrayList<BoardTag>();
@@ -44,15 +51,21 @@ public class Board {
         }
     }
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany
+    @JoinColumn(name = "board_no")
     private List<FileInfo> fileInfoList = new ArrayList<FileInfo>();
 
-    public void addFile(FileInfo fileInfo){
+    public void addFileInfo(FileInfo fileInfo){
         this.fileInfoList.add(fileInfo);
-        if(fileInfo.getBoard() != this){
-            fileInfo.setBoard(this);
-        }
     }
 
+
+    @OneToMany
+    @JoinColumn(name = "board_no")
+    private List<Reply> reply = new ArrayList<Reply>();
+
+    public Integer getReplyCount(){
+        return reply.size();
+    }
 
 }
